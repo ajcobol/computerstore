@@ -1,3 +1,13 @@
+<?php
+require_once "../backend/config/Database.php";
+require_once "../backend/controllers/ProductController.php";
+if (isset($_GET['id'])){
+    $id = $_GET['id'];
+    $producto= new ProductController();
+    $resultado = $producto->getProduct($id);
+}
+
+?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -49,75 +59,39 @@
                     of the webpage-->
             <div class="col-8" style="text-align: justify;">
 
+                
+                <?php
+                    var_dump($resultado);
+                ?>
+
                 <div class="container mt-5">
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#mimodal">Agregar</button>
-                    <h1>Código de producto</h1>
-                    <input type="text" id="formulario" class="form-control my-2">
-                    <button class="btn btn-info mb-2" id="boton">Buscar</button>
-                </div>
-                <div class="modal fade" id="mimodal" tabindex="-1" aria-hidden="true" aria-labelledby="modalTitle">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Registrar nuevo producto</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-
-                                <form action="" method="post" id="frm">
-                                    <div class="mb-3">
-                                        <input type="hidden" name="idp" id="idp">
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="nombre" class="form-label">Nombre:</label>
-                                        <input type="text" class="form-control" id="nombre">
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="marca" class="form-label">Marca:</label>
-                                        <input type="text" class="form-control" id="marca">
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="precio" class="form-label">Precio de Compra:</label>
-                                        <input type="text" class="form-control" id="precio">
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="cantidad" class="form-label">Cantidad Comprada:</label>
-                                        <input type="text" class="form-control" id="cantidad">
-                                    </div>
-
-                                </form>
-
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                <input type="button" value="Registrar" id="registrar" class="btn btn-primary">
-                                
-                            </div>
+                    <form action="" method="post" id="frm">
+                        <div class="mb-3">
+                            <input type="hidden" name="idp" id="idp" value="<?php echo $resultado; ?>">
                         </div>
-                    </div>
-                </div>
 
-                <div class="container mt-5">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Código:</th>
-                                <th>Nombre</th>
-                                <th>Marca</th>
-                                <th>Precio de Compra</th>
-                                <th>Cantidad Comprada</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label">Nombre:</label>
+                            <input type="text" class="form-control" id="nombre">
+                        </div>
 
-                        <tbody  id="resultado">
-                            
-                        </tbody>
-                    </table>
+                        <div class="mb-3">
+                            <label for="marca" class="form-label">Marca:</label>
+                            <input type="text" class="form-control" id="marca">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="precio" class="form-label">Precio de Compra:</label>
+                            <input type="text" class="form-control" id="precio">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="cantidad" class="form-label">Cantidad Comprada:</label>
+                            <input type="text" class="form-control" id="cantidad">
+                        </div>
+
+                    </form>
+                    
                 </div>
             </div>
         </div>
@@ -150,12 +124,10 @@
     }
 
     registrar.addEventListener("click", () => {
-        
         fetch("insert.php", {
             method: "POST",
             body: new FormData(frm)
         }).then(response => response.text()).then(response => {
-            alert(frm);
             if (response == "ok") {
                 Swal.fire({
                     icon: 'success',
@@ -165,7 +137,6 @@
                 })
                 frm.reset();
                 ListarProductos();
-
             }else{
                 if (response == "modificado") {
                     Swal.fire({
@@ -178,8 +149,8 @@
                     idp.value = "";
                     ListarProductos();
                     frm.reset();
-
                 }else{
+                    alert(frm);
                     Swal.fire({
                         icon: 'error',
                         title: 'Error al crear el producto',
@@ -207,7 +178,7 @@ function Eliminar(id) {
                 method: "POST",
                 body: id
             }).then(response => response.text()).then(response => {
-                if (response == "ok") {
+                if (response == TRUE) {
                    ListarProductos();
                    Swal.fire({
                        icon: 'success',
@@ -216,9 +187,7 @@ function Eliminar(id) {
                        timer: 1500
                    })
                 }
-                
             })
-            
         }
     })
 }
